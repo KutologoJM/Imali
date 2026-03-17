@@ -1,0 +1,160 @@
+[project]
+name = "Imali"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.12"
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# Managed by uv. Run `uv sync` to install.
+# Docs: https://docs.astral.sh/uv/
+# -----------------------------------------------------------------------------
+
+dependencies = [
+    # Core
+    "django>=6.0",
+    "python-dotenv>=1.0",
+    "dj-database-url>=2.0",
+    "psycopg2-binary>=2.9.11",
+    "gunicorn==25.0.3",
+
+
+    # Static files
+    "whitenoise>=6.0",
+
+    # Dev utilities (always present)
+    "aiosmtpd==1.4.6", # for mail_debug
+    "django-extensions>=3.2",
+    "django-health-check[celery,psutil,redis]>=3.23.5",
+    "httpx>=0.28.1",
+
+    # Uncomment as needed:
+    # "djangorestframework>=3.15",
+    # "django-filter>=24.0",
+    # "django-cors-headers>=4.0",
+    # "celery[redis]>=5.0",
+    # celery-types>=0.24.0",
+    # "django-celery-beat>=2.0",
+    # "django-celery-results>=2.0",
+    # "django-storages[s3]>=1.14",
+    # "boto3>=1.0",
+    # "sentry-sdk>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Dev server utilities
+    "django-debug-toolbar>=4.0",
+    "django-browser-reload>=1.0",
+    "django-watchfiles>=0.1",
+
+    # Testing
+    "pytest>=8.0",
+    "pytest-django>=4.8",
+    "pytest-cov>=5.0",
+    "factory-boy>=3.3",
+
+    # Code quality
+    "black>=24.0",
+    "ruff>=0.4",
+]
+
+# -----------------------------------------------------------------------------
+# BLACK
+# Docs: https://black.readthedocs.io/en/stable/usage_and_configuration/
+# -----------------------------------------------------------------------------
+
+[tool.black]
+line-length = 119
+target-version = ["py312"]
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | migrations
+  | staticfiles
+)/
+'''
+
+# -----------------------------------------------------------------------------
+# RUFF
+# Configured for Django. Enable the DJ ruleset to catch Django-specific issues.
+# Docs: https://docs.astral.sh/ruff/rules/
+# -----------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 119
+target-version = "py312"
+exclude = [
+    ".git",
+    ".venv",
+    "migrations",
+    "staticfiles",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "DJ",  # flake8-django — Django-specific rules
+    "N",   # pep8-naming
+    "UP",  # pyupgrade — modernise Python syntax
+]
+ignore = [
+    "E501",  # line too long — handled by black
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["Imali"]
+section-order = [
+    "future",
+    "standard-library",
+    "django",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.lint.isort.sections]
+django = ["django"]
+
+# -----------------------------------------------------------------------------
+# PYTEST
+# Docs: https://docs.pytest.org/en/stable/reference/customize.html
+# -----------------------------------------------------------------------------
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "Imali.settings.dev"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",        # fail on unregistered markers
+    "--reuse-db",              # reuse test DB between runs (pytest-django)
+    "--cov",                   # enable coverage by default
+    "--cov-report=term-missing",
+]
+# No testpaths set — pytest discovers tests inside each app automatically.
+# Ensure each app's tests/ directory has an __init__.py.
+
+# -----------------------------------------------------------------------------
+# COVERAGE
+# Docs: https://coverage.readthedocs.io/en/stable/config.html
+# -----------------------------------------------------------------------------
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/settings/*",
+    "manage.py",
+    ".venv/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 0  # Increase this as test coverage improves.
