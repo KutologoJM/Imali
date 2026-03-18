@@ -112,6 +112,7 @@ LOCAL_APPS = [
     "accounts.apps.AccountsConfig",
     "core.apps.CoreConfig",  # abstract models, middleware, shared utilities
     # Add custom local apps here.
+    "apps_directory.transactions"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

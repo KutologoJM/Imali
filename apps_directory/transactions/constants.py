@@ -17,3 +17,15 @@ Example:
         PUBLISHED = "published", "Published"
         ARCHIVED = "archived", "Archived"
 """
+from django.db import models
+
+class TransactionType(models.TextChoices):
+    EXPENSE = "expense", "Expense"
+    INCOME = "income", "Income"
+    TRANSFER = "transfer", "Transfer"
+
+class TransactionStatus(models.TextChoices):
+    UNPAID = "unpaid", "Unpaid" # default state, user or system
+    PAID = "paid", "Paid" # user decided
+    MISSED = "missed", "Missed" # system, missed payment due on this date
+    CANCELLED = "cancelled", "Cancelled" # user designated, planned payment but cancelled

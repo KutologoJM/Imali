@@ -27,3 +27,165 @@ Example:
         def __str__(self):
             return self.title
 """
+
+from uuid import uuid4
+
+from django.contrib.auth import get_user_model
+from django.db import models
+
+from apps_directory.transactions.constants import TransactionType, TransactionStatus
+from apps_directory.transactions.managers import MerchantManager
+from core.models import TimeStampedModel
+from django.core.exceptions import ValidationError
+
+User = get_user_model()
+
+
+class Account(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="accounts")
+    name = models.CharField(max_length=100)
+    group = models.ForeignKey(
+        "AccountGroup", on_delete=models.PROTECT)
+    balance = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.ForeignKey(
+        "Currency", on_delete=models.PROTECT, related_name="accounts"
+    )
+    provider = models.CharField(max_length=100)
+
+    objects = models.Manager()
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Accounts"
+
+    def __str__(self):
+        return f"{self.provider} {self.group.name} Account ({self.currency.currency_code})"
+
+
+class AccountGroup(TimeStampedModel):
+    name = models.CharField(max_length=50, unique=True,
+                            help_text="Supported account groups. E.g. Savings, Credit Card, Cash")
+    description = models.TextField(default="No description")
+
+    objects = models.Manager()
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Account Groups"
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Currency(TimeStampedModel):
+    name = models.CharField(max_length=50)
+    currency_code = models.CharField(max_length=3, unique=True)
+    currency_symbol = models.CharField(max_length=5)
+
+    objects = models.Manager()
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Currencies"
+
+    def __str__(self):
+        return f"({self.currency_code}) {self.currency_symbol} {self.name}"
+
+
+class Merchant(TimeStampedModel):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="merchants", null=True, blank=True)
+    name = models.CharField(max_length=100, help_text="E.g. Netflix, Youtube, Landlord")
+    description = models.TextField(default="No description")
+    is_global = models.BooleanField(default=False)
+
+    objects = MerchantManager()
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Merchants"
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def clean(self):
+        super().clean()
+        if self.is_global and self.user is not None:
+            raise ValidationError({
+                "user": "A global merchant must not be assigned to a user"
+            })
+
+    def save(self, *args, **kwargs):
+        if self.is_global and self.user is not None:
+            raise ValueError(
+                "A global merchant must not be assigned to a user"
+            )
+        super().save(*args, **kwargs)
+
+
+class Category(TimeStampedModel):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="categories",
+    )
+    name = models.CharField(max_length=50, help_text="E.g. Utilities, Groceries")
+    description = models.TextField(default="No description")
+    type = models.CharField(choices=TransactionType, default=TransactionType.EXPENSE, max_length=50)
+
+    objects = models.Manager()
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return f"{self.name} ({self.type})"
+
+
+class Transaction(TimeStampedModel):
+    uuid = models.UUIDField(unique=True, default=uuid4)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="transactions",
+    )
+    account = models.ForeignKey(
+        "Account", on_delete=models.PROTECT, related_name="transactions"
+    )
+    destination_account = models.ForeignKey(
+        "Account", on_delete=models.PROTECT, related_name="incoming_transactions", null=True, blank=True,
+        help_text="Recipient account used for transfers"
+    )
+    merchant = models.ForeignKey(
+        "Merchant", on_delete=models.PROTECT, related_name="transactions"
+    )
+    category = models.ForeignKey(
+        "Category", on_delete=models.PROTECT, related_name="transactions"
+    )
+    """associated_bill = models.ForeignKey(
+        "RecurringBill", on_delete=models.SET_NULL, related_name="transactions", null=True,
+    )"""
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    status = models.CharField(choices=TransactionStatus, default=TransactionStatus.UNPAID, max_length=50)
+    due_date = models.DateField(null=True, blank=True)
+    date_paid = models.DateField(null=True, blank=True)
+    description = models.TextField(default="No description")
+    notes = models.TextField(default="No notes")
+
+    objects = models.Manager()
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Transactions"
+
+    def __str__(self):
+        currency_symbol = self.account.currency.currency_symbol
+
+        if not self.date_paid:
+            return f"{self.status.capitalize()} transaction: {currency_symbol}{self.amount} to {self.merchant}."
+
+        if self.category.type == TransactionType.EXPENSE:
+            return f"Paid {currency_symbol}{self.amount} to {self.merchant} on {self.date_paid}."
+        elif self.category.type == TransactionType.INCOME:
+            return f"Received {currency_symbol}{self.amount} from {self.merchant} on {self.date_paid}."
+        elif self.category.type == TransactionType.TRANSFER:
+            return f"Transferred {currency_symbol}{self.amount} to {self.destination_account} on {self.date_paid}."
+        else:
+            return f"Invalid transaction: {currency_symbol}{self.amount} on {self.date_paid}."

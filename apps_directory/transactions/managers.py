@@ -18,3 +18,20 @@ Example:
         objects = models.Manager()       # default, unrestricted
         published = PublishedManager()   # scoped
 """
+from typing import Self
+from django.db import models
+
+
+class MerchantQuerySet(models.QuerySet):
+    def for_user(self, user) -> Self:
+        return self.filter(
+            models.Q(is_global=True) | models.Q(user=user)
+        )
+
+
+class MerchantManager(models.Manager):
+    def get_queryset(self) -> MerchantQuerySet:
+        return MerchantQuerySet(self.model, using=self._db)
+
+    def for_user(self, user) -> MerchantQuerySet:
+        return self.get_queryset().for_user(user)

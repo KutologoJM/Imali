@@ -32,3 +32,19 @@ Example:
     class ValidationError(AppError):
         pass
 """
+
+
+class AppError(Exception):  # Base for all domain exceptions — catch this to catch everything.
+    pass
+
+
+class PermissionDenied(AppError):
+    pass
+
+
+class NotFound(AppError):
+    pass
+
+
+class ValidationError(AppError):
+    pass

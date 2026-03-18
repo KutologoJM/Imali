@@ -23,3 +23,13 @@ Example:
             return Post.objects.all()
         return Post.objects.filter(author=user)
 """
+from apps_directory.transactions.models import Merchant
+
+
+def get_merchants_for_user(*, user):
+    """
+    The only sanctioned way to query merchants in this codebase.
+    Always returns global merchants combined with the user's own merchants.
+    Never query Merchant.objects directly outside of this selector.
+    """
+    return Merchant.objects.for_user(user)
