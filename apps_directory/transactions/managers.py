@@ -20,9 +20,12 @@ Example:
 """
 from typing import Self
 from django.db import models
+from django.utils import timezone
+from apps_directory.transactions.constants import TransactionType, TransactionStatus
 
 
 class MerchantQuerySet(models.QuerySet):
+
     def for_user(self, user) -> Self:
         return self.filter(
             models.Q(is_global=True) | models.Q(user=user)
@@ -30,8 +33,50 @@ class MerchantQuerySet(models.QuerySet):
 
 
 class MerchantManager(models.Manager):
-    def get_queryset(self) -> MerchantQuerySet:
-        return MerchantQuerySet(self.model, using=self._db)
+    def get_queryset(self):
+        raise NotImplementedError(
+            "MerchantManager requires a user. Use Merchant.objects.for_user(user) instead."
+        )
 
     def for_user(self, user) -> MerchantQuerySet:
-        return self.get_queryset().for_user(user)
+        return MerchantQuerySet(self.model, using=self._db).for_user(user)
+
+
+class TransactionQuerySet(models.QuerySet):
+
+    def for_user(self, user) -> Self:
+        return self.filter(user=user)
+
+    def for_month(self, *, year=None, month=None) -> Self:
+        now = timezone.now()
+        return self.filter(
+            date_paid__year=year or now.year,
+            date_paid__month=month or now.month,
+        )
+
+    def unpaid(self) -> Self:
+        return self.filter(status=TransactionStatus.UNPAID)
+
+    def paid(self) -> Self:
+        return self.filter(status=TransactionStatus.PAID)
+
+    def income(self) -> Self:
+        return self.filter(category__type=TransactionType.INCOME)
+
+    def expenses(self) -> Self:
+        return self.filter(category__type=TransactionType.EXPENSE)
+
+    def transfers(self) -> Self:
+        return self.filter(category__type=TransactionType.TRANSFER)
+
+    def for_account(self, account) -> Self:
+        return self.filter(account=account)
+
+    def in_date_range(self, start, end) -> Self:
+        return self.filter(date_paid__range=(start, end))
+
+    def for_category(self, category) -> Self:
+        return self.filter(category=category)
+
+    def for_merchant(self, merchant) -> Self:
+        return self.filter(merchant=merchant)

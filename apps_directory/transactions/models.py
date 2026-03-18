@@ -34,7 +34,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from apps_directory.transactions.constants import TransactionType, TransactionStatus
-from apps_directory.transactions.managers import MerchantManager
+from apps_directory.transactions.managers import MerchantManager, TransactionQuerySet
 from core.models import TimeStampedModel
 from django.core.exceptions import ValidationError
 
@@ -169,7 +169,7 @@ class Transaction(TimeStampedModel):
     description = models.TextField(default="No description")
     notes = models.TextField(default="No notes")
 
-    objects = models.Manager()
+    objects = TransactionQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at"]
@@ -189,3 +189,4 @@ class Transaction(TimeStampedModel):
             return f"Transferred {currency_symbol}{self.amount} to {self.destination_account} on {self.date_paid}."
         else:
             return f"Invalid transaction: {currency_symbol}{self.amount} on {self.date_paid}."
+
