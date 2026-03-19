@@ -17,17 +17,13 @@ dependencies = [
     "dj-database-url>=2.0",
     "psycopg2-binary>=2.9.11",
     "gunicorn==25.0.3",
-
-
     # Static files
     "whitenoise>=6.0",
-
     # Dev utilities (always present)
     "aiosmtpd==1.4.6", # for mail_debug
     "django-extensions>=3.2",
     "django-health-check[celery,psutil,redis]>=3.23.5",
     "httpx>=0.28.1",
-
     # Uncomment as needed:
     # "djangorestframework>=3.15",
     # "django-filter>=24.0",
@@ -39,6 +35,7 @@ dependencies = [
     # "django-storages[s3]>=1.14",
     # "boto3>=1.0",
     # "sentry-sdk>=2.0",
+    "babel>=2.18.0",
 ]
 
 [project.optional-dependencies]
