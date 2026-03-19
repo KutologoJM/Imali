@@ -81,6 +81,7 @@ class Currency(TimeStampedModel):
     name = models.CharField(max_length=50)
     currency_code = models.CharField(max_length=3, unique=True)
     currency_symbol = models.CharField(max_length=5)
+    locale = models.CharField(max_length=20)
 
     objects = models.Manager()
 
@@ -99,7 +100,8 @@ class Merchant(TimeStampedModel):
     description = models.TextField(default="No description")
     is_global = models.BooleanField(default=False)
 
-    objects = MerchantManager()
+    objects = models.Manager()  # default — for Django internals and admin
+    user_objects = MerchantManager()  # for all application code
 
     class Meta:
         ordering = ["name"]
@@ -130,6 +132,9 @@ class Category(TimeStampedModel):
     name = models.CharField(max_length=50, help_text="E.g. Utilities, Groceries")
     description = models.TextField(default="No description")
     type = models.CharField(choices=TransactionType, default=TransactionType.EXPENSE, max_length=50)
+    icon = models.CharField(max_length=100)  # font-awesome icon
+    icon_color = models.CharField(max_length=30)  # "#ffb400"
+    bg_color = models.CharField(max_length=40)  # "rgba(255,180,0,0.12)"
 
     objects = models.Manager()
 
@@ -139,6 +144,10 @@ class Category(TimeStampedModel):
 
     def __str__(self):
         return f"{self.name} ({self.type})"
+
+    @property
+    def icon_url(self):
+        return f"/static/icons/{self.icon}"
 
 
 class Transaction(TimeStampedModel):
@@ -190,3 +199,60 @@ class Transaction(TimeStampedModel):
         else:
             return f"Invalid transaction: {currency_symbol}{self.amount} on {self.date_paid}."
 
+    def clean(self):
+        super().clean()
+
+        if self.status == TransactionStatus.UNPAID:
+            if not self.due_date:
+                raise ValidationError({
+                    "due_date": "Unpaid transactions must have a due date"
+                })
+            if self.date_paid:
+                raise ValidationError({
+                    "date_paid": "Unpaid transactions cannot have a payment date"
+                })
+
+        if self.status == TransactionStatus.PAID:
+            if not self.date_paid:
+                raise ValidationError({
+                    "date_paid": "A corresponding payment date is required"
+                })
+
+        if self.status == TransactionStatus.MISSED:
+            if not self.due_date:
+                raise ValidationError({
+                    "due_date": "Missed transactions must have a due date"
+                })
+            if self.date_paid:
+                raise ValidationError({
+                    "date_paid": "Missed transactions cannot have a payment date"
+                })
+
+        if self.status == TransactionStatus.CANCELLED:
+            if self.date_paid:
+                raise ValidationError({
+                    "date_paid": "Cancelled transactions cannot have a payment date"
+                })
+
+    def save(self, *args, **kwargs):
+        if self.status == TransactionStatus.UNPAID:
+            if not self.due_date:
+                raise ValueError("Unpaid transactions must have a due date")
+            if self.date_paid:
+                raise ValueError("Unpaid transactions cannot have a payment date")
+
+        if self.status == TransactionStatus.PAID:
+            if not self.date_paid:
+                raise ValueError("A corresponding payment date is required")
+
+        if self.status == TransactionStatus.MISSED:
+            if not self.due_date:
+                raise ValueError("Missed transactions must have a due date")
+            if self.date_paid:
+                raise ValueError("Missed transactions cannot have a payment date")
+
+        if self.status == TransactionStatus.CANCELLED:
+            if self.date_paid:
+                raise ValueError("Cancelled transactions cannot have a payment date")
+
+        super().save(*args, **kwargs)

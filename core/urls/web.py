@@ -20,5 +20,5 @@ Including another URLconf
 from django.urls import path, include
 
 urlpatterns = [
-
+    path("transactions/", include("apps_directory.transactions.urls")),
 ]
