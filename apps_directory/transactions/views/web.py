@@ -23,3 +23,10 @@ Example:
                 form.add_error(None, str(e))
                 return self.form_invalid(form)
 """
+from django.shortcuts import render
+from apps_directory.transactions.selectors import get_all_user_transactions
+
+def dashboard(request):
+    context = {}
+    context["transactions"] = get_all_user_transactions(user=request.user).select_related("category", "merchant", "account__currency")
+    return render(request, 'pages/Dashboard.html', context)

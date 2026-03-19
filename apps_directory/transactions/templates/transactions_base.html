@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="financedark2">
+
+<head>
+    <link rel="stylesheet" href="{% static 'css/output.css' %}?{% now 'U' %}">
+    <!--suppress JSUnresolvedLibraryURL -->
+    <script src="https://kit.fontawesome.com/f23e4a7e43.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <script src="{% static 'js/htmx.min.js.js' %}"></script>
+    <title>
+        {% block head_title %}
+            Reusable base
+        {% endblock %}
+    </title>
+    {% block extra_head_element %} {% endblock %}
+</head>
+
+<body>
+<header>
+    {% block header %}
+    {% endblock %}
+</header>
+
+
+{% block main %}
+{% endblock %}
+
+<footer>
+    {% block footer %}
+    {% endblock %}
+</footer>
+</body>
+
+</html>

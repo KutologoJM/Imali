@@ -37,7 +37,7 @@ def get_merchants_for_user(*, user):
     Always returns global merchants combined with the user's own merchants.
     Never query Merchant.objects directly outside of this selector.
     """
-    return Merchant.objects.for_user(user)
+    return Merchant.user_objects.for_user(user)
 
 
 # Unpaid

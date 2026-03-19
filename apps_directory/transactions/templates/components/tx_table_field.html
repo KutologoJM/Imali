@@ -1,0 +1,54 @@
+<tr>
+    <th>
+        <label>
+            <input type="checkbox" class="checkbox"/>
+        </label>
+    </th>
+    <td>
+        <div class="flex items-center gap-3">
+            <div class="mask mask-squircle h-10 w-10 flex items-center justify-center"
+                 style="background: {{ bg_color }}; color: {{ icon_color }};">
+                <i class="{{ icon }}"></i>
+            </div>
+            <div>
+                <div class="font-semibold text-sm">{{ merchant }} — {{ category }}</div>
+                <div class="text-xs opacity-50">{{ date_paid }}</div>
+            </div>
+        </div>
+    </td>
+    <td class="text-center">
+        <div class="font-semibold text-sm">{{ amount }}</div>
+        {% if status == "unpaid" %}
+            <div class="tooltip tooltip-warning" data-tip="Due {{ due_date }}">
+    <span class="badge badge-xs badge-warning badge-outline sm:hidden">
+        <i class="fa-solid fa-clock"></i>
+    </span>
+                <span class="badge badge-xs badge-warning badge-outline hidden sm:inline">
+                Due {{ due_date }}
+                </span>
+            </div>
+        {% endif %}
+    </td>
+    <td class="text-center">
+        {% if status == "paid" %}
+            <span class="badge badge-success">Paid</span>
+        {% elif status == "unpaid" %}
+            <span class="badge badge-warning">Unpaid</span>
+        {% elif status == "cancelled" %}
+            <span class="badge badge-neutral">Cancelled</span>
+        {% elif status == "missed" %}
+            <span class="badge badge-error">Missed · {{ due_date }}</span>
+        {% else %}
+            <span class="badge badge-error">Error</span>
+        {% endif %}
+    </td>
+    <th>
+        {% if status == "unpaid" %}
+            <button class="btn btn-primary btn-xs">Pay</button>
+            <button class="btn btn-ghost btn-xs" disabled="disabled">Edit</button>
+        {% elif status == "paid" %}
+            <button class="btn btn-primary btn-xs" disabled="disabled">Pay</button>
+            <button class="btn btn-ghost btn-xs">Edit</button>
+        {% endif %}
+    </th>
+</tr>
