@@ -14,7 +14,7 @@ Example:
     class Post(models.Model):
         title = models.CharField(max_length=200)
         body = models.TextField()
-        author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+        author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
         status = models.CharField(max_length=20, choices=PostStatus.choices, default=PostStatus.DRAFT)
         created_at = models.DateTimeField(auto_now_add=True)
 
@@ -29,20 +29,16 @@ Example:
 """
 
 from uuid import uuid4
-
-from django.contrib.auth import get_user_model
 from django.db import models
 
 from apps_directory.transactions.constants import TransactionType, TransactionStatus
 from apps_directory.transactions.managers import MerchantManager, TransactionQuerySet
 from core.models import TimeStampedModel
 from django.core.exceptions import ValidationError
-
-User = get_user_model()
-
+from django.conf import settings
 
 class Account(TimeStampedModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="accounts")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="accounts")
     name = models.CharField(max_length=100)
     group = models.ForeignKey(
         "AccountGroup", on_delete=models.PROTECT)
@@ -95,7 +91,7 @@ class Currency(TimeStampedModel):
 
 class Merchant(TimeStampedModel):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="merchants", null=True, blank=True)
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="merchants", null=True, blank=True)
     name = models.CharField(max_length=100, help_text="E.g. Netflix, Youtube, Landlord")
     description = models.TextField(default="No description")
     is_global = models.BooleanField(default=False)
@@ -127,7 +123,7 @@ class Merchant(TimeStampedModel):
 
 class Category(TimeStampedModel):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="categories",
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="categories",
     )
     name = models.CharField(max_length=50, help_text="E.g. Utilities, Groceries")
     description = models.TextField(default="No description")
@@ -153,7 +149,7 @@ class Category(TimeStampedModel):
 class Transaction(TimeStampedModel):
     uuid = models.UUIDField(unique=True, default=uuid4)
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="transactions",
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="transactions",
     )
     account = models.ForeignKey(
         "Account", on_delete=models.PROTECT, related_name="transactions"

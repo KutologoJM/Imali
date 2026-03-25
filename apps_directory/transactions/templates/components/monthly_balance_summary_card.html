@@ -1,0 +1,26 @@
+
+<div class="card card-border border-base-300 bg-base-200">
+    <div class="card-body">
+        <h2 class="card-title">Net Income for {{ month }}</h2>
+        <div class="flex flex-col gap-2">
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-base-content/60">Total in</span>
+                <span class="font-mono text-sm text-success">+{{ total_income }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-base-content/60">Total out</span>
+                <span class="font-mono text-sm text-error">−{{ total_expenses }}</span>
+            </div>
+            <div class="divider my-0"></div>
+            <div class="flex justify-between items-center">
+                {% if net_income_status == "positive" %}
+                    <span class="text-sm font-bold text-base-content">Net</span>
+                    <span class="font-mono text-sm text-success">+{{ net_income }}</span>
+                {% else %}
+                    <span class="text-sm font-bold text-base-content">Net</span>
+                    <span class="font-mono text-sm text-error">-{{ net_income }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

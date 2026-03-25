@@ -24,9 +24,16 @@ Example:
                 return self.form_invalid(form)
 """
 from django.shortcuts import render
-from apps_directory.transactions.selectors import get_all_user_transactions
+
+from apps_directory.transactions.models import Category
+from apps_directory.transactions.selectors import TransactionSelector, TransactionSummarySelector
 
 def dashboard(request):
     context = {}
-    context["transactions"] = get_all_user_transactions(user=request.user).select_related("category", "merchant", "account__currency")
+
+    context["transactions"] = TransactionSelector(user=request.user).for_user().select_related("category", "merchant", "account__currency")
+    context["transaction_summary_selector"] = TransactionSummarySelector(user=request.user)
+    context["categories"] = Category.objects.filter(user=request.user)
     return render(request, 'pages/Dashboard.html', context)
+
+
