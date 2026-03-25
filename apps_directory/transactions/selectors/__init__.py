@@ -29,7 +29,9 @@ from decimal import Decimal
 from django.db.models import Sum, Q
 from apps_directory.transactions.managers import TransactionQuerySet
 from apps_directory.transactions.models import Merchant, Transaction
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from accounts.models import CustomUser
 
 class MerchantSelector:
     def __init__(self, user):
@@ -106,6 +108,7 @@ class TransactionSelector:
 class TransactionSummarySelector:
     def __init__(self, user):
         self.transactions = TransactionSelector(user=user)
+        self.user = user
 
     def total_income_for_month(self, *, month):
         total_income = (
@@ -123,7 +126,34 @@ class TransactionSummarySelector:
         )
         return total_expenses
 
-    def net_balance_for_month(self, *, month):
+    def net_income_for_month(self, *, month):
         total_income = self.total_income_for_month(month=month)
         total_expenses = self.total_expenses_for_month(month=month)
         return total_income - total_expenses
+
+    def total_expenditure_for_category(self, *, category):
+        total_expenditure = (
+            self.transactions.for_category(category=category).aggregate(
+                total=Sum("amount")
+            )["total"] or Decimal("0")
+        )
+        return total_expenditure
+
+    def total_expenditure_for_category_for_month(self, *, month, category):
+        total_expenditure = (
+            self.transactions.for_category_for_month(month=month, category=category).aggregate(
+                total=Sum("amount")
+            )["total"] or Decimal("0")
+        )
+        return total_expenditure
+
+    def get_user(self):
+        return self.user
+
+
+class UserPreferencesSelector:
+    def __init__(self, user):
+        self.user: CustomUser = user
+
+    def preferred_currency(self):
+        return self.user.preferences.preferred_currency
