@@ -23,109 +23,107 @@ Example:
             return Post.objects.all()
         return Post.objects.filter(author=user)
 """
+
+###
 from decimal import Decimal
-
-from django.db.models import Sum
-
+from django.db.models import Sum, Q
+from apps_directory.transactions.managers import TransactionQuerySet
 from apps_directory.transactions.models import Merchant, Transaction
-from django.db import models
 
 
-def get_merchants_for_user(*, user):
-    """
-    The only sanctioned way to query merchants in this codebase.
-    Always returns global merchants combined with the user's own merchants.
-    Never query Merchant.objects directly outside of this selector.
-    """
-    return Merchant.user_objects.for_user(user)
+class MerchantSelector:
+    def __init__(self, user):
+        self.user = user
+
+    @staticmethod
+    def for_user(user):
+        """
+               The only sanctioned way to query merchants in this codebase.
+               Always returns global merchants combined with the user's own merchants.
+               Never query Merchant.objects directly outside this selector.
+        """
+        return Merchant.user_objects.for_user(user)
 
 
-# Unpaid
-def get_user_unpaid_transactions_for_month(*, month, user):
-    return get_all_user_transactions_for_month(user=user, month=month).unpaid()
+class TransactionSelector:
+    def __init__(self, user):
+        self.user = user
+
+    def filtered(self, *, merchant=None, category=None, month=None):
+        q = Q()
+        if merchant:
+            q &= Q(merchant=merchant)
+        if category:
+            q &= Q(category=category)
+        qs = self.for_user().filter(q)
+        if month:
+            qs = qs.for_month(month=month)
+        return qs
+
+    def for_user(self) -> TransactionQuerySet:
+        return Transaction.objects.for_user(self.user)
+
+    def for_month(self, *, month):
+        return self.for_user().for_month(month=month)
+
+    def paid_for_month(self, *, month):
+        return self.for_month(month=month).paid()
+
+    def unpaid_for_month(self, *, month):
+        return self.for_month(month=month).unpaid()
+
+    def income_for_user(self):
+        return self.for_user().income()
+
+    def income_for_month(self, *, month):
+        return self.income_for_user().for_month(month=month)
+
+    def expenses_for_user(self):
+        return self.for_user().expenses()
+
+    def expenses_for_month(self, *, month):
+        return self.expenses_for_user().for_month(month=month)
+
+    def transfers_for_user(self):
+        return self.for_user().transfers()
+
+    def transfers_for_month(self, *, month):
+        return self.transfers_for_user().for_month(month=month)
+
+    def for_category(self, *, category):
+        return self.for_user().for_category(category=category)
+
+    def for_category_for_month(self, *, month, category):
+        return self.for_category(category=category).for_month(month=month)
+
+    def for_account(self, *, account):
+        return self.for_user().for_account(account=account)
+
+    def for_account_for_month(self, *, month, account):
+        return self.for_account(account=account).for_month(month=month)
 
 
-# Paid
-def get_user_paid_transactions_for_month(*, month, user):
-    return get_all_user_transactions_for_month(user=user, month=month).paid()
+class TransactionSummarySelector:
+    def __init__(self, user):
+        self.transactions = TransactionSelector(user=user)
 
+    def total_income_for_month(self, *, month):
+        total_income = (
+                self.transactions.income_for_month(month=month).aggregate(
+                    total=Sum("amount")
+                )["total"] or Decimal("0")
+        )
+        return total_income
 
-# Net Balance
-def get_user_net_balance_for_month(*, user, month):
-    total_income = (
-        get_user_total_income_for_month(user=user, month=month)
-        .aggregate(total=Sum("amount"))["total"] or Decimal("0")
-    )
-    total_expenses = (
-        get_users_total_expenses_for_month(user=user, month=month)
-        .aggregate(total=Sum("amount"))["total"] or Decimal("0")
-    )
-    return total_income - total_expenses
+    def total_expenses_for_month(self, *, month):
+        total_expenses = (
+                self.transactions.expenses_for_month(month=month).aggregate(
+                    total=Sum("amount")
+                )["total"] or Decimal("0")
+        )
+        return total_expenses
 
-
-# All - no filter
-def get_all_user_transactions(*, user):
-    return Transaction.objects.for_user(user)
-
-
-# Time
-def get_all_user_transactions_for_month(*, user, month):
-    return get_all_user_transactions(user=user).for_month(month=month)
-
-
-# Income
-def get_all_user_income_transactions(*, user):
-    return get_all_user_transactions(user=user).income()
-
-
-def get_user_total_income_for_month(*, user, month):
-    return get_all_user_income_transactions(user=user).for_month(month=month)
-
-
-# Expenses
-def get_all_user_expenses(*, user):
-    return get_all_user_transactions(user=user).expenses()
-
-
-def get_users_total_expenses_for_month(*, user, month):
-    return get_all_user_expenses(user=user).for_month(month=month)
-
-
-# Transfers
-def get_all_user_transfers(*, user):
-    return get_all_user_transactions(user=user).transfers()
-
-
-def get_all_user_transfers_for_month(*, user, month):
-    return get_all_user_transfers(user=user).for_month(month=month)
-
-
-# Category
-def get_user_monthly_transactions_by_category(*, category, user, month):
-    return get_all_user_transactions_for_month(user=user, month=month).for_category(category)
-
-
-# Search bar
-def get_filtered_user_transactions(*, user, merchant=None, category=None, month=None):
-    q = models.Q()
-
-    if merchant:
-        q &= models.Q(merchant=merchant)
-    if category:
-        q &= models.Q(category=category)
-
-    transactions = Transaction.objects.for_user(user).filter(q)
-
-    if month:
-        transactions = transactions.for_month(month=month)
-
-    return transactions
-
-
-# Account
-def get_all_user_transactions_for_account(*, user, account):
-    return get_all_user_transactions(user=user).for_account(account=account)
-
-
-def get_all_user_transactions_for_account_for_month(*, user, month, account):
-    return get_all_user_transactions_for_account(user=user, account=account).for_month(month=month)
+    def net_balance_for_month(self, *, month):
+        total_income = self.total_income_for_month(month=month)
+        total_expenses = self.total_expenses_for_month(month=month)
+        return total_income - total_expenses
