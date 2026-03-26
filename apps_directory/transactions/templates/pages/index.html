@@ -1,5 +1,6 @@
 {% extends "transactions_base.html" %}
 {% load static %}
+{% load ui_tags %}
 {% block head_title %} Transactions {% endblock %}
 {% block extra_head_element %} {% endblock %}
 {% block navbar_title %}
@@ -22,8 +23,38 @@
 {% endblock %}
 {% block header %}{% endblock %}
 {% block main %}
-    <main>
+    <main class="grid grid-cols-3 container mx-auto mt-10"> {# fixme mt-10 temporary #}
+        <section class="col-span-2"> {# Transactions Table #}
+            <div
+                    id="transactions-table"
+                    hx-trigger="load"
+                    hx-target="#transactions-table"
+                    hx-get="{% url 'transactions:transactions_table' %}"
+            >
+                {% include 'components/tx_table_skeleton.html' %}
+            </div>
 
+
+        </section>
+        <section class="col-span-1"> {# Monthly Summary + Monthly Category Breakdown #}
+            <div
+                    id="monthly_balance_summary"
+                    hx-trigger="load"
+                    hx-target="#monthly_balance_summary"
+                    hx-get="{% url 'transactions:monthly_balance_summary' %}"
+            >
+                {% include 'components/balance_summary_skeleton.html' %}
+            </div>
+            <div
+                    id="monthly_category_summary"
+                    hx-trigger="load"
+                    hx-target="#monthly_category_summary"
+                    hx-get="{% url 'transactions:monthly_category_summary' %}"
+            >
+                {% include 'components/category_summary_skeleton.html' %}
+
+            </div>
+        </section>
     </main>
 {% endblock %}
 {% block footer %}{% endblock %}

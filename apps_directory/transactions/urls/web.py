@@ -26,4 +26,7 @@ from apps_directory.transactions.views import web as web_views
 app_name = "transactions"
 urlpatterns = [
     path("", web_views.index, name="index"),
+    path("monthly-category-summary/", web_views.monthly_category_summary, name="monthly_category_summary"),
+    path("monthly-balance-summary/", web_views.monthly_balance_summary, name="monthly_balance_summary"),
+    path("transactions-table/", web_views.transactions_table, name="transactions_table"),
 ]

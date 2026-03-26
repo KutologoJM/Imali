@@ -28,7 +28,7 @@ Example:
 from decimal import Decimal
 from django.db.models import Sum, Q
 from apps_directory.transactions.managers import TransactionQuerySet
-from apps_directory.transactions.models import Merchant, Transaction
+from apps_directory.transactions.models import Merchant, Transaction, Category
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from accounts.models import CustomUser
@@ -46,6 +46,15 @@ class MerchantSelector:
         """
         return Merchant.user_objects.for_user(user)
 
+class CategorySelector:
+    def __init__(self, user):
+        self.user = user
+
+    def for_user(self):
+        return Category.objects.filter(user=self.user)
+
+    def for_month(self, *, month):
+        return self.for_user().for_month(month=month)
 
 class TransactionSelector:
     def __init__(self, user):
