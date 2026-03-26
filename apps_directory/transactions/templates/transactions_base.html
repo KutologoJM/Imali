@@ -6,30 +6,82 @@
     <link rel="stylesheet" href="{% static 'css/output.css' %}?{% now 'U' %}">
     <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://kit.fontawesome.com/f23e4a7e43.js" crossorigin="anonymous"></script>
+    {# todo convert to a local js file #}
     <meta charset="UTF-8">
     <script src="{% static 'js/htmx.min.js.js' %}"></script>
+    {# todo update local file #}
     <title>
         {% block head_title %}
-            Reusable base
+            Transactions base
         {% endblock %}
     </title>
     {% block extra_head_element %} {% endblock %}
 </head>
 
 <body>
-<header>
-    {% block header %}
+<div class="drawer lg:drawer-open">
+    <input id="my-drawer-4" type="checkbox" class="drawer-toggle"/>
+    <div class="drawer-content">
+        {# drawer content - all page content #}
+        {# Header, Main, Footer #}
+        <header>
+            <!-- Navbar -->
+            <nav class="navbar w-full bg-base-300 hidden lg:flex"> {# only appears on large screens and up #}
+                <label for="my-drawer-4" aria-label="open sidebar" class="btn btn-square btn-ghost">
+                    <!-- Sidebar toggle icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round"
+                         stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"
+                         class="my-1.5 inline-block size-4">
+                        <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
+                        <path d="M9 4v16"></path>
+                        <path d="M14 10l2 2l-2 2"></path>
+                    </svg>
+                </label>
+                <div class="px-4">{% block navbar_title %}Navbar Title{% endblock %}</div>
+            </nav>
+
+            {% block header %}
+            {% endblock %}
+        </header>
+
+        <!-- Page content here -->
+        {% block main %}
+        {% endblock %}
+
+        <footer>
+            {% block footer %}
+            {% endblock %}
+        </footer>
+
+    </div>
+    {# end of drawer content - end of page content #}
+
+    <div class="drawer-side is-drawer-close:overflow-visible hidden lg:block "> {# only appears on large screens and above #}
+        <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
+        <div class="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
+            <!-- Sidebar content here -->
+            <ul class="menu w-full grow">
+                <!-- Transactions Index -->
+                <li>
+                    <a href="{% url 'transactions:index' %}"
+                       class="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Homepage">
+                        <!-- Transactions icon -->
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                        <span class="is-drawer-close:hidden">Transactions</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<section class="pb-18 lg:pb-0">
+    {% block dock %}
+        {# dock appears on medium screens and smaller #}
+        {# todo add the block element as well as logic for knowing which page it's on #}
     {% endblock %}
-</header>
+</section>
 
-
-{% block main %}
-{% endblock %}
-
-<footer>
-    {% block footer %}
-    {% endblock %}
-</footer>
 </body>
 
 </html>

@@ -1,0 +1,29 @@
+{% extends "transactions_base.html" %}
+{% load static %}
+{% block head_title %} Transactions {% endblock %}
+{% block extra_head_element %} {% endblock %}
+{% block navbar_title %}
+    Transactions Dashboard
+    <section class="">
+        <!-- Visible on small screens, medium and up -->
+        <div class="block md:hidden">
+            Small Screen
+        </div>
+        <!-- Visible on medium screens, hidden on small, large and up -->
+        <div class="hidden md:block lg:hidden">
+            Medium Screen
+        </div>
+
+        <!-- Hidden on small and medium screens, visible on large and up -->
+        <div class="hidden lg:block">
+            Large and above
+        </div>
+    </section>
+{% endblock %}
+{% block header %}{% endblock %}
+{% block main %}
+    <main>
+
+    </main>
+{% endblock %}
+{% block footer %}{% endblock %}

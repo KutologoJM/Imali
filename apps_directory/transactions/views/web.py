@@ -28,12 +28,21 @@ from django.shortcuts import render
 from apps_directory.transactions.models import Category
 from apps_directory.transactions.selectors import TransactionSelector, TransactionSummarySelector
 
+
 def dashboard(request):
     context = {}
 
-    context["transactions"] = TransactionSelector(user=request.user).for_user().select_related("category", "merchant", "account__currency")
+    context["transactions"] = TransactionSelector(user=request.user).for_user().select_related("category", "merchant",
+                                                                                               "account__currency")
     context["transaction_summary_selector"] = TransactionSummarySelector(user=request.user)
     context["categories"] = Category.objects.filter(user=request.user)
     return render(request, 'pages/Dashboard.html', context)
 
 
+def index(request):
+    """
+      This view will serve as the main page for the transactions app.
+    """
+    context = {}
+
+    return render(request, 'pages/index.html', context)

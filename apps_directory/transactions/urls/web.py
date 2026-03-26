@@ -23,6 +23,7 @@ Example:
 from django.urls import path
 from apps_directory.transactions.views import web as web_views
 
+app_name = "transactions"
 urlpatterns = [
-    path("dashboard/", web_views.dashboard, name="dashboard"),
+    path("", web_views.index, name="index"),
 ]
