@@ -1,0 +1,50 @@
+<fieldset class="fieldset">
+    <legend class="fieldset-legend">Accounts</legend>
+    <select class="select" name="account">
+        <option value="" disabled selected>Pick an Account</option>
+    <option value="">--</option>
+        {% for account in accounts %}
+            <option value="{{ account.name }}">{{ account.name }}</option>
+        {% endfor %}
+    </select>
+    <span class="label">Optional</span>
+</fieldset>
+
+<fieldset class="fieldset">
+    <legend class="fieldset-legend">Due Dates</legend>
+    <select class="select" name="due_date">
+        <option value="" disabled selected>Pick a date</option>
+        <option value="">--</option>
+        {% for date in due_dates %}
+            <option value="{{ date|date:"n" }}">{{ date|date:"F-Y" }}</option>
+        {% endfor %}
+    </select>
+    <span class="label">Optional</span>
+</fieldset>
+<fieldset class="fieldset">
+    <legend class="fieldset-legend">Dates Paid</legend>
+    <select class="select" name="date_paid">
+        <option value="" disabled selected>Pick a date</option>
+        <option value="">--</option>
+        {% for date in dates_paid %}
+            <option value="{{ date|date:"n" }}">{{ date|date:"F-Y" }}</option>
+        {% endfor %}
+    </select>
+    <span class="label">Optional</span>
+</fieldset>
+
+<div class="tabs tabs-box">
+    <input type="radio" name="tx_status" value="" class="tab" aria-label="All" checked="checked"/>
+
+    {% for value, label in transaction_statuses %}
+        <input type="radio" name="tx_status" value="{{ value }}" class="tab" aria-label="{{ label }}"/>
+    {% endfor %}
+</div>
+
+<div class="tabs tabs-box">
+    <input type="radio" name="tx_type" value="" class="tab" aria-label="All" checked="checked"/>
+
+    {% for value, label in transaction_types %}
+        <input type="radio" name="tx_type" value="{{ value }}" class="tab" aria-label="{{ label }}"/>
+    {% endfor %}
+</div>

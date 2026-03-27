@@ -27,9 +27,10 @@ import uuid
 from datetime import datetime
 ###
 from decimal import Decimal
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, QuerySet
 from apps_directory.transactions.managers import TransactionQuerySet
-from apps_directory.transactions.models import Merchant, Transaction, Category
+from apps_directory.transactions.models import Merchant, Transaction, Category, Account
+from apps_directory.transactions.constants import TransactionStatus, TransactionType
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -65,34 +66,22 @@ class TransactionSelector:
     def __init__(self, user):
         self.user = user
 
-    def filtered(self, *, merchant=None, category=None, month=None, name=None):
-        q = Q()
-        if merchant:
-            q &= Q(merchant=merchant)
-        if category:
-            q &= Q(category=category)
-        qs = self.for_user().filter(q)
-        if month:
-            qs = qs.for_month(month=month)
-        if name:
-            qs.filter(merchant=merchant)
-        return qs
-
-    def filtered_search(self, *, account=None, category=None, due_date=None, date_paid=None, status=None, tx_type=None,
+    def filtered_search(self, *, account=None, category=None, due_date=None, date_paid=None, tx_status=None,
+                        tx_type=None,
                         query=""):
         q = Q()
-        if account is not None:
+        if account:
             q &= Q(account__name=account)
-        if category is not None:
+        if category:
             q &= Q(category__name=category)
-        if due_date is not None:
+        if due_date:
             q &= Q(due_date__month=due_date)
-        if date_paid is not None:
+        if date_paid:
             q &= Q(date_paid__month=date_paid)
-        if status is not None:
-            q &= Q(status=status)
-        if tx_type is not None:
-            q &= Q(type=tx_type)
+        if tx_status:
+            q &= Q(status=tx_status)
+        if tx_type:
+            q &= Q(category__type=tx_type)
 
         search = Q(merchant__name__icontains=query) | Q(category__name__icontains=query) | Q(
             description__icontains=query)
@@ -154,6 +143,12 @@ class TransactionSelector:
     def for_account_for_month(self, *, month, account):
         return self.for_account(account=account).for_month(month=month)
 
+    def get_date_paid_months(self):
+        return self.for_user().filter(date_paid__isnull=False).dates('date_paid', 'month')
+
+    def get_due_date_months(self) -> QuerySet:
+        return self.for_user().filter(due_date__isnull=False).dates('due_date', 'month')
+
 
 class TransactionSummarySelector:
     def __init__(self, user):
@@ -207,3 +202,23 @@ class UserPreferencesSelector:
 
     def preferred_currency(self):
         return self.user.preferences.preferred_currency
+
+
+class AccountsSelector:
+    def __init__(self, user):
+        self.user: CustomUser = user
+
+    def for_user(self):
+        return Account.objects.filter(user=self.user)
+
+
+class TransactionMetadataSelector:
+    @staticmethod
+    def get_transaction_types():
+        tx_types = TransactionType.choices
+        return tx_types
+
+    @staticmethod
+    def get_transaction_statuses():
+        tx_statuses = TransactionStatus.choices
+        return tx_statuses

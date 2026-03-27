@@ -1,0 +1,9 @@
+<form
+        id="search_and_filter_form"
+        hx-post="{% url 'transactions:transactions_table' %}"
+        hx-target="#transactions_table"
+        hx-trigger="keyup delay:500 from:[name='transaction_query'], change from:select, change from:[type='radio']">
+    {% csrf_token %}
+    {% include 'components/transactions_search_bar.html' %}
+    {% include 'components/filter_buttons.html' %}
+</form>

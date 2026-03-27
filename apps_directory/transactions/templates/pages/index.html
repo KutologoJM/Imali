@@ -25,7 +25,14 @@
 {% block main %}
     <main class="grid grid-cols-3 container mx-auto mt-10"> {# fixme mt-10 temporary #}
         <div class="col-span-3 w-full lg:w-1/2">
-            {% include 'components/transactions_search_bar.html' %}
+            <div
+                    id="search-and-filter"
+                    hx-trigger="load"
+                    hx-target="#search-and-filter"
+                    hx-get="{% url 'transactions:search_and_filter_transactions' %}"
+            >
+                {% include 'partials/search_and_filter_form.html' %}
+            </div>
         </div>
         <section class="col-span-2"> {# Transactions Table #}
 

@@ -25,7 +25,8 @@ Example:
 """
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
-from apps_directory.transactions.selectors import TransactionSelector, TransactionSummarySelector, CategorySelector
+from apps_directory.transactions.selectors import TransactionSelector, TransactionSummarySelector, CategorySelector, \
+    AccountsSelector, TransactionMetadataSelector
 
 
 def index(request):
@@ -33,7 +34,6 @@ def index(request):
       This view will serve as the main page for the transactions app.
     """
     context = {}
-
     return render(request, 'pages/index.html', context)
 
 
@@ -61,18 +61,39 @@ def monthly_balance_summary(request):
 
 def transactions_table(request):
     context = {}
-    if request.method == "GET":
+    if request.method == "GET":  # runs once during the initial load
         context["transactions"] = TransactionSelector(user=request.user).for_user().select_related(
             "category",
             "merchant",
             "account__currency")
-        return render(request, "partials/transactions_table.html", context)
     elif request.method == "POST":
         query = request.POST.get("transaction_query")
-        context["transactions"] = TransactionSelector(user=request.user).filtered_search(query=query).select_related(
+        account = request.POST.get("account")
+        due_date = request.POST.get("due_date")
+        date_paid = request.POST.get("date_paid")
+        transaction_status = request.POST.get("tx_status")
+        transaction_type = request.POST.get("tx_type")
+        transactions = TransactionSelector(user=request.user).filtered_search(query=query, account=account,
+                                                                              due_date=due_date, date_paid=date_paid,
+                                                                              tx_status=transaction_status,
+                                                                              tx_type=transaction_type)
+        context["transactions"] = transactions.select_related(
             "category",
             "merchant",
             "account__currency")
-        return render(request, 'partials/transactions_table.html', context)
+    else:
+        return HttpResponseNotFound("404")
+    return render(request, 'partials/transactions_table.html', context)
+
+
+def search_and_filter_transactions(request):
+    context = {}
+    if request.method == "GET": # Loads the initial filter options for the given user
+        context["accounts"] = AccountsSelector(user=request.user).for_user().select_related()
+        context["dates_paid"] = TransactionSelector(user=request.user).get_date_paid_months()
+        context["due_dates"] = TransactionSelector(user=request.user).get_due_date_months()
+        context["transaction_statuses"] = TransactionMetadataSelector.get_transaction_statuses()
+        context["transaction_types"] = TransactionMetadataSelector.get_transaction_types()
+        return render(request, "partials/search_and_filter_form.html", context)
     else:
         return HttpResponseNotFound("404")

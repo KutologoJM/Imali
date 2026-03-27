@@ -29,4 +29,5 @@ urlpatterns = [
     path("monthly-category-summary/", web_views.monthly_category_summary, name="monthly_category_summary"),
     path("monthly-balance-summary/", web_views.monthly_balance_summary, name="monthly_balance_summary"),
     path("transactions-table/", web_views.transactions_table, name="transactions_table"),
+    path("search-and-filter/", web_views.search_and_filter_transactions, name="search_and_filter_transactions"),
 ]
