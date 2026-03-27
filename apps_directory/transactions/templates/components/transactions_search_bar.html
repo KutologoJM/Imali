@@ -1,0 +1,12 @@
+<form>
+    {% csrf_token %}
+    <label
+            id="transactions_search_bar"
+            hx-trigger="keyup delay:500"
+            hx-target="#transactions_table"
+            hx-post="{% url 'transactions:transactions_table' %}"
+            class="input w-full">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" required placeholder="Search" name="transaction_query"/>
+    </label>
+</form>

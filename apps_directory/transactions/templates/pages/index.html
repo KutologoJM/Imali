@@ -24,11 +24,15 @@
 {% block header %}{% endblock %}
 {% block main %}
     <main class="grid grid-cols-3 container mx-auto mt-10"> {# fixme mt-10 temporary #}
+        <div class="col-span-3 w-full lg:w-1/2">
+            {% include 'components/transactions_search_bar.html' %}
+        </div>
         <section class="col-span-2"> {# Transactions Table #}
+
             <div
-                    id="transactions-table"
+                    id="transactions_table"
                     hx-trigger="load"
-                    hx-target="#transactions-table"
+                    hx-target="#transactions_table"
                     hx-get="{% url 'transactions:transactions_table' %}"
             >
                 {% include 'components/tx_table_skeleton.html' %}

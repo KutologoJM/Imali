@@ -23,15 +23,18 @@ Example:
             return Post.objects.all()
         return Post.objects.filter(author=user)
 """
-
+import uuid
+from datetime import datetime
 ###
 from decimal import Decimal
 from django.db.models import Sum, Q
 from apps_directory.transactions.managers import TransactionQuerySet
 from apps_directory.transactions.models import Merchant, Transaction, Category
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from accounts.models import CustomUser
+
 
 class MerchantSelector:
     def __init__(self, user):
@@ -46,6 +49,7 @@ class MerchantSelector:
         """
         return Merchant.user_objects.for_user(user)
 
+
 class CategorySelector:
     def __init__(self, user):
         self.user = user
@@ -56,11 +60,12 @@ class CategorySelector:
     def for_month(self, *, month):
         return self.for_user().for_month(month=month)
 
+
 class TransactionSelector:
     def __init__(self, user):
         self.user = user
 
-    def filtered(self, *, merchant=None, category=None, month=None):
+    def filtered(self, *, merchant=None, category=None, month=None, name=None):
         q = Q()
         if merchant:
             q &= Q(merchant=merchant)
@@ -69,7 +74,43 @@ class TransactionSelector:
         qs = self.for_user().filter(q)
         if month:
             qs = qs.for_month(month=month)
+        if name:
+            qs.filter(merchant=merchant)
         return qs
+
+    def filtered_search(self, *, account=None, category=None, due_date=None, date_paid=None, status=None, tx_type=None,
+                        query=""):
+        q = Q()
+        if account is not None:
+            q &= Q(account__name=account)
+        if category is not None:
+            q &= Q(category__name=category)
+        if due_date is not None:
+            q &= Q(due_date__month=due_date)
+        if date_paid is not None:
+            q &= Q(date_paid__month=date_paid)
+        if status is not None:
+            q &= Q(status=status)
+        if tx_type is not None:
+            q &= Q(type=tx_type)
+
+        search = Q(merchant__name__icontains=query) | Q(category__name__icontains=query) | Q(
+            description__icontains=query)
+        try:
+            uuid.UUID(query)
+            search |= Q(uuid=query)
+        except ValueError:
+            pass
+
+        try:
+            month_number = datetime.strptime(query.capitalize(), "%B").month
+            search |= Q(due_date__month=month_number) | Q(date_paid__month=month_number)
+        except ValueError:
+            pass
+
+        filtered_queryset = Transaction.objects.for_user(user=self.user).filter(q)
+        result = filtered_queryset.filter(search)
+        return result
 
     def for_user(self) -> TransactionQuerySet:
         return Transaction.objects.for_user(self.user)
@@ -142,17 +183,17 @@ class TransactionSummarySelector:
 
     def total_expenditure_for_category(self, *, category):
         total_expenditure = (
-            self.transactions.for_category(category=category).aggregate(
-                total=Sum("amount")
-            )["total"] or Decimal("0")
+                self.transactions.for_category(category=category).aggregate(
+                    total=Sum("amount")
+                )["total"] or Decimal("0")
         )
         return total_expenditure
 
     def total_expenditure_for_category_for_month(self, *, month, category):
         total_expenditure = (
-            self.transactions.for_category_for_month(month=month, category=category).aggregate(
-                total=Sum("amount")
-            )["total"] or Decimal("0")
+                self.transactions.for_category_for_month(month=month, category=category).aggregate(
+                    total=Sum("amount")
+                )["total"] or Decimal("0")
         )
         return total_expenditure
 

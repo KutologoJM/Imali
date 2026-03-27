@@ -25,19 +25,7 @@ Example:
 """
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
-
-from apps_directory.transactions.models import Category
 from apps_directory.transactions.selectors import TransactionSelector, TransactionSummarySelector, CategorySelector
-
-
-def dashboard(request):
-    context = {}
-
-    context["transactions"] = TransactionSelector(user=request.user).for_user().select_related("category", "merchant",
-                                                                                               "account__currency")
-    context["transaction_summary_selector"] = TransactionSummarySelector(user=request.user)
-    context["categories"] = Category.objects.filter(user=request.user)
-    return render(request, 'pages/Dashboard.html', context)
 
 
 def index(request):
@@ -52,11 +40,12 @@ def index(request):
 def monthly_category_summary(request):
     context = {}
     if request.method == "GET":
-        context["categories"] = CategorySelector(user=request.user).for_user().select_related("user__preferences",)
+        context["categories"] = CategorySelector(user=request.user).for_user().select_related("user__preferences", )
         return render(request, "partials/monthly_category_summary.html", context)
     elif request.method == "POST":
         month = request.POST.get("month")
-        context["categories"] = CategorySelector(user=request.user).for_month(month=month).select_related("user__preferences",)
+        context["categories"] = CategorySelector(user=request.user).for_month(month=month).select_related(
+            "user__preferences", )
         return render(request, "partials/monthly_category_summary.html", context)
     else:
         return HttpResponseNotFound("404")
@@ -73,11 +62,17 @@ def monthly_balance_summary(request):
 def transactions_table(request):
     context = {}
     if request.method == "GET":
-        context["transactions"] = TransactionSelector(user=request.user).for_user().select_related("category",
-                                                                                                   "merchant",
-                                                                                                   "account__currency")
+        context["transactions"] = TransactionSelector(user=request.user).for_user().select_related(
+            "category",
+            "merchant",
+            "account__currency")
         return render(request, "partials/transactions_table.html", context)
     elif request.method == "POST":
-        return None
+        query = request.POST.get("transaction_query")
+        context["transactions"] = TransactionSelector(user=request.user).filtered_search(query=query).select_related(
+            "category",
+            "merchant",
+            "account__currency")
+        return render(request, 'partials/transactions_table.html', context)
     else:
         return HttpResponseNotFound("404")
