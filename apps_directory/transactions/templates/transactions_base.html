@@ -6,16 +6,15 @@
     <link rel="stylesheet" href="{% static 'css/output.css' %}?{% now 'U' %}">
     <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://kit.fontawesome.com/f23e4a7e43.js" crossorigin="anonymous"></script>
-    {# todo convert to a local js file #}
     <meta charset="UTF-8">
-    <script src="{% static 'js/htmx.min.js.js' %}"></script>
-    {# todo update local file #}
+    <script src="{% static 'js/htmx.min.js' %}"></script>
     <title>
         {% block head_title %}
             Transactions base
         {% endblock %}
     </title>
     {% block extra_head_element %} {% endblock %}
+    <script src="{% static 'js/theme-change@2.5.0.js' %}"></script>
 </head>
 
 <body>
@@ -38,6 +37,32 @@
                     </svg>
                 </label>
                 <div class="px-4">{% block navbar_title %}Navbar Title{% endblock %}</div>
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-2">
+                        <i class="fa-solid fa-palette"></i>
+                        <span class="hidden sm:inline">Theme</span>
+                        <i class="fa-solid fa-chevron-down text-xs opacity-60"></i>
+                    </div>
+                    <ul tabindex="0"
+                        class="dropdown-content menu bg-base-200 rounded-box z-10 w-44 p-2 shadow-lg border border-base-300">
+                        <li class="menu-title text-xs">Select Theme</li>
+                        <li>
+                            <button class="theme-controller" data-set-theme="financesdark2">
+                                <i class="fa-solid fa-moon"></i> Finance Dark
+                            </button>
+                        </li>
+                        <li>
+                            <button class="theme-controller" data-set-theme="space">
+                                <i class="fa-solid fa-rocket"></i> Space
+                            </button>
+                        </li>
+                        <li>
+                            <button class="theme-controller" data-set-theme="dark">
+                                <i class="fa-solid fa-circle-half-stroke"></i> Dark
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </nav>
 
             {% block header %}
@@ -56,7 +81,8 @@
     </div>
     {# end of drawer content - end of page content #}
 
-    <div class="drawer-side is-drawer-close:overflow-visible hidden lg:block "> {# only appears on large screens and above #}
+    <div class="drawer-side is-drawer-close:overflow-visible hidden lg:block ">
+        {# only appears on large screens and above #}
         <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
         <div class="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
             <!-- Sidebar content here -->

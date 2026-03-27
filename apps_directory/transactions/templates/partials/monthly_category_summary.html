@@ -1,14 +1,20 @@
 {% load ui_tags %}
 
-
-<div class="card bg-base-200 rounded-box p-4">
-  <span class="text-2xs font-bold tracking-[0.12em] uppercase text-base-content/38 block mb-3">
-    By Category
-  </span>
-    <div class="flex flex-col gap-3">
-        {% for category in categories %}
-            {% monthly_category_summary_card category %}
-        {% endfor %}
-
+<div class="card card-border border-base-300 bg-base-200">
+    <div class="card-body">
+        <h2 class="card-title text-sm">
+            <i class="fa-solid fa-chart-pie text-base-content/50"></i>
+            Spending by Category
+        </h2>
+        <div class="flex flex-col gap-3 mt-2">
+            {% for category in categories %}
+                {% monthly_category_summary_card category %}
+            {% empty %}
+                <p class="text-sm text-base-content/50 text-center py-4">
+                    No category data available
+                </p>
+            {% endfor %}
+        </div>
     </div>
 </div>
+

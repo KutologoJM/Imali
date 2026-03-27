@@ -4,7 +4,7 @@
 {% block head_title %} Transactions {% endblock %}
 {% block extra_head_element %} {% endblock %}
 {% block navbar_title %}
-    Transactions Dashboard
+    <span class="text-lg font-semibold">Transactions</span>
     <section class="">
         <!-- Visible on small screens, medium and up -->
         <div class="block md:hidden">
@@ -23,8 +23,9 @@
 {% endblock %}
 {% block header %}{% endblock %}
 {% block main %}
-    <main class="grid grid-cols-3 container mx-auto mt-10"> {# fixme mt-10 temporary #}
-        <div class="col-span-3 w-full lg:w-1/2">
+    <main class="container mx-auto px-4 py-6 lg:py-10">
+        <!-- Search & Filter Section -->
+        <section class="mb-6">
             <div
                     id="search-and-filter"
                     hx-trigger="load"
@@ -33,39 +34,42 @@
             >
                 {% include 'partials/search_and_filter_form.html' %}
             </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Transactions Table (2/3 width on large screens) -->
+            <section class="lg:col-span-2 order-2 lg:order-1">
+                <div
+                        id="transactions_table"
+                        hx-trigger="load"
+                        hx-target="#transactions_table"
+                        hx-get="{% url 'transactions:transactions_table' %}"
+                >
+                    {% include 'components/tx_table_skeleton.html' %}
+                </div>
+            </section>
+
+            <!-- Sidebar: Summary Cards (1/3 width on large screens) -->
+            <aside class="lg:col-span-1 order-1 lg:order-2 flex flex-col gap-4">
+                <div
+                        id="monthly_balance_summary"
+                        hx-trigger="load"
+                        hx-target="#monthly_balance_summary"
+                        hx-get="{% url 'transactions:monthly_balance_summary' %}"
+                >
+                    {% include 'components/balance_summary_skeleton.html' %}
+                </div>
+                <div
+                        id="monthly_category_summary"
+                        hx-trigger="load"
+                        hx-target="#monthly_category_summary"
+                        hx-get="{% url 'transactions:monthly_category_summary' %}"
+                >
+                    {% include 'components/category_summary_skeleton.html' %}
+                </div>
+            </aside>
         </div>
-        <section class="col-span-2"> {# Transactions Table #}
-
-            <div
-                    id="transactions_table"
-                    hx-trigger="load"
-                    hx-target="#transactions_table"
-                    hx-get="{% url 'transactions:transactions_table' %}"
-            >
-                {% include 'components/tx_table_skeleton.html' %}
-            </div>
-
-
-        </section>
-        <section class="col-span-1"> {# Monthly Summary + Monthly Category Breakdown #}
-            <div
-                    id="monthly_balance_summary"
-                    hx-trigger="load"
-                    hx-target="#monthly_balance_summary"
-                    hx-get="{% url 'transactions:monthly_balance_summary' %}"
-            >
-                {% include 'components/balance_summary_skeleton.html' %}
-            </div>
-            <div
-                    id="monthly_category_summary"
-                    hx-trigger="load"
-                    hx-target="#monthly_category_summary"
-                    hx-get="{% url 'transactions:monthly_category_summary' %}"
-            >
-                {% include 'components/category_summary_skeleton.html' %}
-
-            </div>
-        </section>
     </main>
 {% endblock %}
 {% block footer %}{% endblock %}
