@@ -1,0 +1,60 @@
+<form
+        id="{{ form_slug }}"
+        method="post"
+        hx-post="{% url 'transactions:universal_create' form_slug=form_slug %}"
+        hx-target="#target-1"
+        hx-trigger="submit"
+        name="{{ form_slug }}"
+        class="card m-4 p-4 w-96 border border-base-300 bg-base-100"
+>
+    {% csrf_token %}
+    <h2 class="text-4xl font-bold">
+        {{ form_name }} Form
+    </h2>
+
+    {# Non-field errors #}
+    {% if form.non_field_errors %}
+        <div class="alert alert-error mb-4">
+            <ul>
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="card-body">
+        {% for form_field in form %}
+            <fieldset class="fieldset">
+
+                <legend class="fieldset-legend">
+                    {{ form_field.label_tag }}
+                </legend>
+
+                <div>
+                    {{ form_field }}
+                </div>
+
+                {% if form_field.help_text %}
+                    <p class="text-sm text-base-content/60 mt-1">{{ form_field.help_text|safe }}</p>
+                {% endif %}
+
+                {# Field-specific errors #}
+                {% if form_field.errors %}
+                    <div class="alert alert-error mt-2">
+                        <ul>
+                            {% for error in form_field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+            </fieldset>
+
+        {% endfor %}
+        <div class="card-actions justify-center">
+            <button type="submit" class="btn btn-wide btn-primary justify-center">Save</button>
+        </div>
+    </div>
+</form>

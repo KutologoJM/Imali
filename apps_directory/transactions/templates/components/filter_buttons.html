@@ -1,0 +1,60 @@
+<div class="flex flex-col gap-4">
+    <!-- Dropdown Filters -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <fieldset class="fieldset">
+            <legend class="fieldset-legend">Account</legend>
+            <select class="select select-bordered w-full" name="account">
+                <option value="" disabled selected>Pick an Account</option>
+                <option value="">All Accounts</option>
+                {% for account in accounts %}
+                    <option value="{{ account.name }}">{{ account.name }}</option>
+                {% endfor %}
+            </select>
+        </fieldset>
+
+        <fieldset class="fieldset">
+            <legend class="fieldset-legend">Due Date</legend>
+            <select class="select select-bordered w-full" name="due_date">
+                <option value="" disabled selected>Pick a date</option>
+                <option value="">All Dates</option>
+                {% for date in due_dates %}
+                    <option value="{{ date|date:"n" }}">{{ date|date:"F Y" }}</option>
+                {% endfor %}
+            </select>
+        </fieldset>
+
+        <fieldset class="fieldset">
+            <legend class="fieldset-legend">Date Paid</legend>
+            <select class="select select-bordered w-full" name="date_paid">
+                <option value="" disabled selected>Pick a date</option>
+                <option value="">All Dates</option>
+                {% for date in dates_paid %}
+                    <option value="{{ date|date:"n" }}">{{ date|date:"F Y" }}</option>
+                {% endfor %}
+            </select>
+        </fieldset>
+    </div>
+
+   <!-- Toggle Filters -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-2">
+            <span class="text-xs font-semibold text-base-content/60 uppercase tracking-wide">Status</span>
+            <div class="tabs tabs-box tabs-sm">
+                <input type="radio" name="tx_status" value="" class="tab" aria-label="All" checked="checked"/>
+                {% for value, label in transaction_statuses %}
+                    <input type="radio" name="tx_status" value="{{ value }}" class="tab" aria-label="{{ label }}"/>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <span class="text-xs font-semibold text-base-content/60 uppercase tracking-wide">Type</span>
+            <div class="tabs tabs-box tabs-sm">
+                <input type="radio" name="tx_type" value="" class="tab" aria-label="All" checked="checked"/>
+                {% for value, label in transaction_types %}
+                    <input type="radio" name="tx_type" value="{{ value }}" class="tab" aria-label="{{ label }}"/>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

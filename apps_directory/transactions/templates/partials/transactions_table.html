@@ -1,120 +1,47 @@
 {% load ui_tags %}
-<div class="overflow-x-auto">
-    <table class="table border-base-300 bg-base-200 border">
-        <thead>
-        <tr>
-            <th>
-                <label>
-                    <input type="checkbox" class="checkbox"/>
-                </label>
-            </th>
-            <th class="text-center">Transaction</th>
-            <th class="text-center">Amount</th>
-            <th class="text-center">Status</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        {# todo add a month section and filter view by month #}
-        {% for transaction in transactions %}
-            {% tx_table_field transaction %}
-        {% endfor %}
-        <tr>
-            <th>
-                <label>
-                    <input type="checkbox" class="checkbox checkbox-xs"/>
-                </label>
-            </th>
-            <td>
-                <div class="flex items-center gap-3">
-                    <div class="mask mask-squircle h-10 w-10 flex items-center justify-center"
-                         style="background: rgba(255,180,0,0.12); color: #ffb400;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                             fill="currentColor">
-                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="font-semibold text-sm">Visayan Electric — Electricity</div>
-                        <div class="text-xs opacity-50">March-25</div>
-                    </div>
-                </div>
-            </td>
-            <td class="text-center">
-                <div class="font-semibold text-sm">P6,000</div>
-                <span class="badge badge-xs badge-warning badge-outline">Over by P500</span>
-            </td>
-            <td class="text-center">
-                {% if paid %}
-                    <span class="badge badge-xs badge-success">Paid</span>
-                {% elif unpaid %}
-                    <span class="badge badge-xs badge-warning">Unpaid · 20 Mar</span>
-                {% elif cancelled %}
-                    <span class="badge badge-xs badge-neutral">Cancelled</span>
-                {% elif missed %}
-                    <span class="badge badge-xs badge-error">Missed · 20 Mar</span>
-                {% else %}
-                    <span class="badge badge-xs badge-error">Error</span>
-                {% endif %}
-            </td>
-            <th>
-                <button class="btn btn-primary btn-xs">Pay</button>
-                <button class="btn btn-ghost btn-xs">Edit</button>
-            </th>
-        </tr>
-        <tr>
-            <th>
-                <label>
-                    <input type="checkbox" class="checkbox"/>
-                </label>
-            </th>
-            <td>
-                <div class="flex items-center gap-3">
-                    <div class="mask mask-squircle h-10 w-10 flex items-center justify-center"
-                         style="background: rgba(255,180,0,0.12); color: #ffb400;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                             fill="currentColor">
-                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="font-semibold text-sm">Merchant — Category</div>
-                        <div class="text-xs opacity-50">Month-Day</div>
-                    </div>
-                </div>
-            </td>
-            <td class="text-center">
-                <div class="font-semibold text-sm">Amount</div>
-                <span class="badge badge-xs badge-warning badge-outline">Unpaid · 20 Mar</span>
-            </td>
-            <td class="text-center">
-                {% if paid %}
-                    <span class="badge badge-success">Paid</span>
-                {% elif unpaid %}
-                    <span class="badge badge-warning">Unpaid · 20 Mar</span>
-                {% elif cancelled %}
-                    <span class="badge badge-neutral">Cancelled</span>
-                {% elif missed %}
-                    <span class="badge badge-error">Missed · 20 Mar</span>
-                {% else %}
-                    <span class="badge badge-error">Error</span>
-                {% endif %}
-            </td>
-            <th>
-                <button class="btn btn-primary btn-xs">Pay</button>
-                <button class="btn btn-ghost btn-xs">Edit</button>
-            </th>
-        </tr>
-        </tbody>
-        <tfoot>
-        <tr>
-            <th></th>
-            <th class="text-center">Transaction</th>
-            <th class="text-center">Amount</th>
-            <th class="text-center">Status</th>
-            <th></th>
-        </tr>
-        </tfoot>
-    </table>
+<div id="transactions_table" class="card bg-base-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table table-zebra">
+            <thead class="bg-base-300">
+            <tr>
+                <th class="w-12">
+                    <label>
+                        <input type="checkbox" class="checkbox checkbox-sm"/>
+                    </label>
+                </th>
+                <th class="text-center">Transaction</th>
+                <th class="text-center">Amount</th>
+                <th class="text-center">Status</th>
+                <th class="w-28"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for transaction in transactions %}
+                {% tx_table_field transaction %}
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-8 text-base-content/50">
+                        <i class="fa-solid fa-inbox text-3xl mb-2"></i>
+                        <p>No transactions found</p>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if transactions %}
+    <div class="card-body py-3 border-t border-base-300">
+        <div class="flex justify-between items-center text-sm text-base-content/60">
+            <span>{{ transactions|length }} transaction{{ transactions|length|pluralize }}</span>
+            <!-- Pagination placeholder -->
+            <div class="join">
+                <button class="join-item btn btn-xs btn-ghost" disabled>«</button>
+                <button class="join-item btn btn-xs btn-ghost btn-active">1</button>
+                <button class="join-item btn btn-xs btn-ghost" disabled>»</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 

@@ -33,7 +33,6 @@ urlpatterns = [
                 "health_check.Mail",
                 "health_check.Storage",
                 # 3rd party checks
-                "health_check.contrib.psutil.Battery", # fixme incompatible with Render
                 "health_check.contrib.psutil.CPU",
                 "health_check.contrib.psutil.Memory",
                 "health_check.contrib.psutil.Disk",

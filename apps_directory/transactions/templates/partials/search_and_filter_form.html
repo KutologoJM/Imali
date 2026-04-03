@@ -1,0 +1,14 @@
+<form
+        id="search_and_filter_form"
+        class="card bg-base-200 p-4 rounded-box space-y-4"
+        hx-post="{% url 'transactions:transactions_table' %}"
+        hx-target="#transactions_table"
+        hx-trigger="keyup delay:500 from:[name='transaction_query'], change from:select, change from:[type='radio']">
+    {% csrf_token %}
+    
+    {% include 'components/transactions_search_bar.html' %}
+    
+    <div class="divider my-0 text-xs text-base-content/50">Filters</div>
+    
+    {% include 'components/filter_buttons.html' %}
+</form>

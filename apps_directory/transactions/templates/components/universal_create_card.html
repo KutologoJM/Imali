@@ -1,0 +1,16 @@
+<div class="card card-border bg-base-100 w-96">
+    <div class="card-body">
+        <h2 class="card-title">{{ form_name }}</h2>
+        <p>Create a new {{ form_name }}</p>
+        <div class="card-actions justify-end">
+            <button
+                    id="create-{{ form_slug }}"
+                    class="btn btn-primary"
+                    type="submit"
+                    hx-get="{% url 'transactions:universal_create' form_slug=form_slug %}"
+                    hx-target="#target-1"
+            >Create
+            </button>
+        </div>
+    </div>
+</div>

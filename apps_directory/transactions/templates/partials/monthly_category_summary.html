@@ -1,34 +1,20 @@
 {% load ui_tags %}
 
-
-<div class="card bg-base-200 rounded-box p-4">
-  <span class="text-2xs font-bold tracking-[0.12em] uppercase text-base-content/38 block mb-3">
-    By Category
-  </span>
-    <div class="flex flex-col gap-3">
-        {% for category in categories %}
-            {% monthly_category_summary_card category %}
-        {% endfor %}
-        <div>
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-sm text-base-content/60">Housing</span>
-                <span class="font-mono text-sm text-base-content/38">R14,000</span>
-            </div>
-            <div class="relative w-full h-1.5 bg-base-content/10 rounded-full overflow-hidden">
-                <div class="absolute inset-y-0 left-0 w-full bg-error rounded-full"></div>
-            </div>
+<div class="card card-border border-base-300 bg-base-200">
+    <div class="card-body">
+        <h2 class="card-title text-sm">
+            <i class="fa-solid fa-chart-pie text-base-content/50"></i>
+            Spending by Category
+        </h2>
+        <div class="flex flex-col gap-3 mt-2">
+            {% for category in categories %}
+                {% monthly_category_summary_card category %}
+            {% empty %}
+                <p class="text-sm text-base-content/50 text-center py-4">
+                    No category data available
+                </p>
+            {% endfor %}
         </div>
-
-        <div>
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-sm text-base-content/60">Food</span>
-                <span class="font-mono text-sm text-base-content/38">R1,325</span>
-            </div>
-            <div class="relative w-full h-1.5 bg-base-content/10 rounded-full overflow-hidden">
-                <div class="absolute inset-y-0 left-0 w-[9%] bg-warning rounded-full"></div>
-            </div>
-        </div>
-
-
     </div>
 </div>
+

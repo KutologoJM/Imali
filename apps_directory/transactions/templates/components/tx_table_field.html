@@ -1,54 +1,79 @@
-<tr>
-    <th>
+<tr class="hover:bg-base-300/50 transition-colors">
+    <th class="w-12">
         <label>
-            <input type="checkbox" class="checkbox"/>
+            <input type="checkbox" class="checkbox checkbox-sm"/>
         </label>
     </th>
     <td>
         <div class="flex items-center gap-3">
-            <div class="mask mask-squircle h-10 w-10 flex items-center justify-center"
+            <div class="mask mask-squircle h-10 w-10 flex items-center justify-center shrink-0"
                  style="background: {{ bg_color }}; color: {{ icon_color }};">
-                <i class="{{ icon }}"></i>
+                {{ icon }}
             </div>
-            <div>
-                <div class="font-semibold text-sm">{{ merchant }} — {{ category }}</div>
-                <div class="text-xs opacity-50">{{ date_paid }}</div>
+            <div class="min-w-0">
+                <div class="font-medium text-sm truncate">{{ merchant }}</div>
+                <div class="text-xs text-base-content/50 flex items-center gap-1">
+                    <span>{{ category }}</span>
+                    <span class="text-base-content/30">·</span>
+                    <span>{{ date_paid }}</span>
+                </div>
             </div>
         </div>
     </td>
+
     <td class="text-center">
-        <div class="font-semibold text-sm">{{ amount }}</div>
-        {% if status == "unpaid" %}
-            <div class="tooltip tooltip-warning" data-tip="Due {{ due_date }}">
-    <span class="badge badge-xs badge-warning badge-outline sm:hidden">
-        <i class="fa-solid fa-clock"></i>
-    </span>
-                <span class="badge badge-xs badge-warning badge-outline hidden sm:inline">
-                Due {{ due_date }}
+        <div class="flex items-center justify-center gap-2">
+            <span class="font-semibold text-sm">{{ amount }}</span>
+            {% if status == "unpaid" %}
+                <div class="tooltip tooltip-warning" data-tip="Due {{ due_date }}">
+                <span class="badge badge-xs badge-warning badge-outline">
+                    <i class="fa-solid fa-clock"></i>
+                    <span class="hidden md:inline">Due {{ due_date }}</span>
                 </span>
-            </div>
-        {% endif %}
+                </div>
+            {% endif %}
+        </div>
     </td>
+
     <td class="text-center">
         {% if status == "paid" %}
-            <span class="badge badge-success">Paid</span>
+            <span class="badge badge-success badge-sm gap-1">
+                <i class="fa-solid fa-check text-xs"></i> Paid
+            </span>
         {% elif status == "unpaid" %}
-            <span class="badge badge-warning">Unpaid</span>
+            <span class="badge badge-warning badge-sm gap-1">
+                <i class="fa-solid fa-clock text-xs"></i> Unpaid
+            </span>
         {% elif status == "cancelled" %}
-            <span class="badge badge-neutral">Cancelled</span>
+            <span class="badge badge-neutral badge-sm gap-1">
+                <i class="fa-solid fa-ban text-xs"></i> Cancelled
+            </span>
         {% elif status == "missed" %}
-            <span class="badge badge-error">Missed · {{ due_date }}</span>
+            <span class="badge badge-error badge-sm gap-1">
+                <i class="fa-solid fa-exclamation text-xs"></i> Missed
+            </span>
         {% else %}
-            <span class="badge badge-error">Error</span>
+            <span class="badge badge-error badge-sm">Error</span>
         {% endif %}
     </td>
-    <th>
-        {% if status == "unpaid" %}
-            <button class="btn btn-primary btn-xs">Pay</button>
-            <button class="btn btn-ghost btn-xs" disabled="disabled">Edit</button>
-        {% elif status == "paid" %}
-            <button class="btn btn-primary btn-xs" disabled="disabled">Pay</button>
-            <button class="btn btn-ghost btn-xs">Edit</button>
-        {% endif %}
-    </th>
+
+    <td>
+        <div class="flex gap-1 justify-end">
+            {% if status == "unpaid" %}
+                <button class="btn btn-primary btn-xs">Pay</button>
+                <button class="btn btn-ghost btn-xs">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+            {% elif status == "paid" %}
+                <button class="btn btn-secondary btn-xs">Edit</button>
+                <button class="btn btn-ghost btn-xs">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+            {% else %}
+                <button class="btn btn-ghost btn-xs">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+            {% endif %}
+        </div>
+    </td>
 </tr>

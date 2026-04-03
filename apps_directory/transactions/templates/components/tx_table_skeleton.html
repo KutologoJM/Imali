@@ -1,0 +1,52 @@
+<div class="overflow-x-auto">
+    <table class="table border-base-300 bg-base-200 border">
+        <thead>
+            <tr>
+                <th><label><input type="checkbox" class="checkbox" disabled/></label></th>
+                <th class="text-center">Transaction</th>
+                <th class="text-center">Amount</th>
+                <th class="text-center">Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for _ in "12345" %}
+            <tr>
+                <th><label><input type="checkbox" class="checkbox" disabled/></label></th>
+                <td>
+                    <div class="flex items-center gap-3">
+                        <div class="skeleton mask mask-squircle h-10 w-10 shrink-0"></div>
+                        <div class="flex flex-col gap-1">
+                            <div class="skeleton h-4 w-36"></div>
+                            <div class="skeleton h-3 w-20"></div>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="skeleton h-4 w-20"></div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="skeleton h-5 w-16 rounded-full mx-auto"></div>
+                </td>
+                <th>
+                    <div class="flex gap-1">
+                        <div class="skeleton h-6 w-10 rounded-lg"></div>
+                        <div class="skeleton h-6 w-10 rounded-lg"></div>
+                    </div>
+                </th>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th class="text-center">Transaction</th>
+                <th class="text-center">Amount</th>
+                <th class="text-center">Status</th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
