@@ -37,7 +37,8 @@
                     </svg>
                 </label>
                 <div class="px-4">{% block navbar_title %}Navbar Title{% endblock %}</div>
-                <div class="dropdown dropdown-end">
+
+                <div class="dropdown dropdown-end ml-auto">
                     <div tabindex="0" role="button" class="btn btn-ghost btn-sm gap-2">
                         <i class="fa-solid fa-palette"></i>
                         <span class="hidden sm:inline">Theme</span>
@@ -47,7 +48,7 @@
                         class="dropdown-content menu bg-base-200 rounded-box z-10 w-44 p-2 shadow-lg border border-base-300">
                         <li class="menu-title text-xs">Select Theme</li>
                         <li>
-                            <button class="theme-controller" data-set-theme="financesdark2">
+                            <button class="theme-controller" data-set-theme="financedark2">
                                 <i class="fa-solid fa-moon"></i> Finance Dark
                             </button>
                         </li>
@@ -65,8 +66,7 @@
                 </div>
             </nav>
 
-            {% block header %}
-            {% endblock %}
+            {% block header %}{% endblock %}
         </header>
 
         <!-- Page content here -->
@@ -74,25 +74,31 @@
         {% endblock %}
 
         <footer>
-            {% block footer %}
-            {% endblock %}
+            {% block footer %}{% endblock %}
         </footer>
-
     </div>
     {# end of drawer content - end of page content #}
 
-    <div class="drawer-side is-drawer-close:overflow-visible hidden lg:block ">
+    <div class="drawer-side is-drawer-close:overflow-visible hidden lg:block">
         {# only appears on large screens and above #}
         <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
+
         <div class="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
             <!-- Sidebar content here -->
             <ul class="menu w-full grow">
-                <!-- Transactions Index -->
                 <li>
                     <a href="{% url 'transactions:index' %}"
-                       class="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Homepage">
-                        <!-- Transactions icon -->
-                        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                       class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                       data-tip="Dashboard">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="is-drawer-close:hidden">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#"
+                       class="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                       data-tip="Transactions">
+                        <i class="fa-solid fa-list-ul"></i>
                         <span class="is-drawer-close:hidden">Transactions</span>
                     </a>
                 </li>

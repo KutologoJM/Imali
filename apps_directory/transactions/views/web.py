@@ -23,10 +23,12 @@ Example:
                 form.add_error(None, str(e))
                 return self.form_invalid(form)
 """
+from django import forms
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from apps_directory.transactions.selectors import TransactionSelector, TransactionSummarySelector, CategorySelector, \
     AccountsSelector, TransactionMetadataSelector
+from apps_directory.transactions.forms.web import AccountForm, MerchantForm, CategoryForm
 
 
 def index(request):
@@ -88,12 +90,55 @@ def transactions_table(request):
 
 def search_and_filter_transactions(request):
     context = {}
-    if request.method == "GET": # Loads the initial filter options for the given user
+    if request.method == "GET":  # Loads the initial filter options for the given user
         context["accounts"] = AccountsSelector(user=request.user).for_user().select_related()
         context["dates_paid"] = TransactionSelector(user=request.user).get_date_paid_months()
         context["due_dates"] = TransactionSelector(user=request.user).get_due_date_months()
         context["transaction_statuses"] = TransactionMetadataSelector.get_transaction_statuses()
         context["transaction_types"] = TransactionMetadataSelector.get_transaction_types()
         return render(request, "partials/search_and_filter_form.html", context)
+    else:
+        return HttpResponseNotFound("404")
+
+
+def universal_create_view(request, form_slug):
+    context = {}
+    form_mapping = {
+        "merchant-form": MerchantForm,
+        "category-form": CategoryForm,
+        "account-form": AccountForm,
+    }
+    form_name = str(form_slug).split('-')[0]
+    context['form_name'] = form_name
+
+    if request.method == "GET":
+        context["form_slug"] = form_slug
+        context["form"] = form_mapping[form_slug]
+        return render(request, 'components/universal_form_card.html', context)
+    elif request.method == "POST":
+        match form_slug:
+            case "merchant-form":
+                form = MerchantForm(request.POST)
+                needs_user = True
+            case "category-form":
+                form = CategoryForm(request.POST)
+                needs_user = True
+            case "account-form":
+                form = AccountForm(request.POST)
+                needs_user = True
+            case _:
+                return HttpResponseNotFound("404")
+
+        if form.is_valid(): # fixme merchant validation broken
+            form_instance = form.save(commit=False)
+            if needs_user:
+                form_instance.user = request.user
+            form_instance.save()
+            return render(request, 'components/feedback/form_creation_success.html', context)
+        else:
+            context["form_slug"] = form_slug
+            context["form"] = form
+            context['status'] = 400
+            return render(request, 'components/universal_form_card.html', context)
     else:
         return HttpResponseNotFound("404")

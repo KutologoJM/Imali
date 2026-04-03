@@ -21,11 +21,49 @@
         </div>
     </section>
 {% endblock %}
+
 {% block header %}{% endblock %}
+
 {% block main %}
-    <main class="container mx-auto px-4 py-6 lg:py-10">
-        <!-- Search & Filter Section -->
-        <section class="mb-6">
+    <main class="container mx-auto px-4 py-6 lg:py-10 space-y-6">
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            <a class="btn btn-primary btn-sm sm:btn-md justify-start gap-2" href="#">
+                <i class="fa-solid fa-plus"></i>
+                Add Transaction {# fixme #}
+            </a>
+            <button
+                    id="create-account-form"
+                    class="btn btn-outline btn-sm sm:btn-md justify-start gap-2"
+                    type="submit"
+                    hx-get="{% url 'transactions:universal_create' form_slug='account-form' %}"
+                    hx-target="#target-1"
+            >
+                <i class="fa-solid fa-wallet"></i>
+                Add Account
+            </button>
+
+            <button
+                    id="create-category-form"
+                    class="btn btn-outline btn-sm sm:btn-md justify-start gap-2"
+                    type="submit"
+                    hx-get="{% url 'transactions:universal_create' form_slug='category-form' %}"
+                    hx-target="#target-1"
+            ><i class="fa-solid fa-tag"></i>
+                Add Category
+            </button>
+
+            <button
+                    id="create-merchant-form"
+                    class="btn btn-outline btn-sm sm:btn-md justify-start gap-2"
+                    type="submit"
+                    hx-get="{% url 'transactions:universal_create' form_slug='merchant-form' %}"
+                    hx-target="#target-1"
+            >
+                <i class="fa-solid fa-store"></i>Add Merchant
+            </button>
+        </section>
+
+        <section>
             <div
                     id="search-and-filter"
                     hx-trigger="load"
@@ -70,6 +108,9 @@
                 </div>
             </aside>
         </div>
+    <div id="target-1"> {# fixme #}
+    </div>
     </main>
 {% endblock %}
+
 {% block footer %}{% endblock %}

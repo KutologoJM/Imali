@@ -8,7 +8,7 @@
         <div class="flex items-center gap-3">
             <div class="mask mask-squircle h-10 w-10 flex items-center justify-center shrink-0"
                  style="background: {{ bg_color }}; color: {{ icon_color }};">
-                <i class="{{ icon }}"></i>
+                {{ icon }}
             </div>
             <div class="min-w-0">
                 <div class="font-medium text-sm truncate">{{ merchant }}</div>
@@ -65,7 +65,7 @@
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
             {% elif status == "paid" %}
-                <button class="btn btn-neutral btn-xs">Edit</button>
+                <button class="btn btn-secondary btn-xs">Edit</button>
                 <button class="btn btn-ghost btn-xs">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
